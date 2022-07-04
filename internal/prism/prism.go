@@ -4,89 +4,21 @@ import (
 	"fmt"
 	"prism-go/internal/helpers"
 	"prism-go/internal/parser"
-
+	"github.com/hisamafahri/coco"
 	"github.com/gdamore/tcell/v2"
 )
 
-/*
-func Calculate(operators [3]string, t, n int) (map[int]map[int]int, int) {
-	d := (n * 2) - 1
-	p := make(map[int]map[int]int)
-	for i := 0; i < d; i++ {
-		p[i] = make(map[int]int)
-		for j := 0; j < d; j++ {
-			p[i][j] = 32
-		}
-	}
-	o1 := operators[0]
-	o2 := operators[1]
-	o3 := operators[2]
-	for z := 0; z < n; z++ {
-		for y := 0; y < n; y++ {
-			for x := 0; x < n; x++ {
-				if p[y + z][x + z] >> 5 == 1 {
-					//p[y + z][x + z] = parser.Calculate(fmt.Sprintf("%v%v%v%v%v%v%v", t, o1, z, o2, y, o3, x)) % n
-					p[y + z][x + z] = helpers.Modulo(parser.Calculate(fmt.Sprintf("%v%v%v%v%v%v%v", t, o1, z, o2, y, o3, x)), n)
-
-				}
-			}
-		}
-	}
-	return p, d
-}
-
-func Render(s tcell.Screen, c *helpers.Container, pause, drawUI, colour bool, termWH [2]int, p map[int]map[int]int, n, d int) {
+func Render(s tcell.Screen, ops [3]string, colours [3]int, termWH [2]int, n, t int) {
 	// border
-	if pause == false {
-		var c string
-		if colour == true {
-			c = "hue"
-		}
-		if colour == false {
-			c = "lightness"
-		}
-		s.Clear()
-		for y := 0; y < d; y++ {
-			for x := 0; x < d; x++ {
-				if p[y][x] != 32 {
-					style := tcell.StyleDefault.Foreground(helpers.Colour(c, p[y][x], n)).Background(tcell.ColorReset)
-					s.SetContent(
-						helpers.Centre(termWH[0], d) + x, helpers.Centre(termWH[1], d) + y,
-						rune('█'), nil, style)
-				}
-			}
-		}
-	}
-	if drawUI == true {
-		c.DrawUI(s)
-	}
-	s.Show()
-}*/
 
-func Render(s tcell.Screen, colour bool, ops [3]string, termWH [2]int, n, t int) {
-	// border
-	var c string
-	if colour == true {
-		c = "hue-fun"
-	} else {
-		c = "lightness"
-	}
 	s.Clear()
 	d := n * 2
 	for z := 0; z < n; z++ {
 		for y := 0; y < n; y++ {
 			for x := 0; x < n; x++ {
-				if z != (n - 1) {
-					if x == 0 || y == 0 {
-						thueMorseN := ThueMorse(x, y, z, t, n, ops[0], ops[1], ops[2])
-						style := tcell.StyleDefault.Foreground(helpers.Colour(c, thueMorseN, n, t)).Background(tcell.ColorReset)
-						s.SetContent(
-							helpers.Centre(termWH[0], d)+x+z, helpers.Centre(termWH[1], d)+y+z,
-							rune('█'), nil, style)
-					}
-				} else {
-					thueMorseN := ThueMorse(x, y, z, t, n, ops[0], ops[1], ops[2])
-					style := tcell.StyleDefault.Foreground(helpers.Colour(c, thueMorseN, n, t)).Background(tcell.ColorReset)
+				if ((z != (n - 1)) && (x == 0 || y == 0)) || z == (n - 1) {
+					thueMorseN := thueMorse(n, t, z, y, x, ops[0], ops[1], ops[2])
+					style := tcell.StyleDefault.Foreground(getColour(colours, thueMorseN, n, t)).Background(tcell.ColorReset)
 					s.SetContent(
 						helpers.Centre(termWH[0], d)+x+z, helpers.Centre(termWH[1], d)+y+z,
 						rune('█'), nil, style)
@@ -96,41 +28,69 @@ func Render(s tcell.Screen, colour bool, ops [3]string, termWH [2]int, n, t int)
 	}
 }
 
-func ThueMorse(t, z, y, x, n int, o1, o2, o3 string) int {
-	//var toSum []int
+func thueMorse(n, t, z, y, x int, o1, o2, o3 string) int {
 	var parsed int
-	/*
-		for _, i := range []int{t, z, y, x} {
-			toSum = append(toSum, numberToBase(i, b))
-		}*/
-	t = NumberToBase(t, n)
-	z = NumberToBase(z, n)
-	y = NumberToBase(y, n)
-	x = NumberToBase(x, n)
+	t = helpers.NumberToBase(t, n)
+	z = helpers.NumberToBase(z, n)
+	y = helpers.NumberToBase(y, n)
+	x = helpers.NumberToBase(x, n)
 	parsed = parser.Calculate(fmt.Sprintf("%v%v%v%v%v%v%v", t, o1, z, o2, y, o3, x))
 	return helpers.Modulo(parsed, n)
 }
 
-func NumberToBase(n, b int) int {
-	if n == 0 {
-		return 0
-	}
-	var digits []int
-	var condition bool = true
-	for condition {
-		digits = append(digits, helpers.Modulo(n, b))
-		n = n / b
-		if n == 0 {
-			condition = false
-		}
-	}
-	return Sum(digits)
-}
+func getColour(colours [3]int, thueMorseN, n, t int) tcell.Color {
+	var hue, sat, light float64
+	var colour [3]float64
 
-func Sum(array []int) int {
-	result := 0
-	for _, v := range array {
-		result += v
+	for i, e := range colours {
+		if i == 0 {
+			if e == 0 {
+				hue = float64(0)
+			}
+			if e == 1 {
+				hue = float64((360/n)*helpers.Modulo(t, n))
+			}
+			if e == 2 {
+				//hue = float64((360/n)*thueMorseN)
+				hue = float64((360/n)*helpers.Modulo(thueMorseN+t, n))
+			}
+			if e == 3 {
+				hue = float64((360/n)*thueMorseN + t)
+			}
+		}
+		if i == 1 {
+			if e == 0 {
+				sat = float64(0)
+			}
+			if e == 1 {
+				sat = float64(100)
+			}
+			if e == 2 {
+				sat = float64((100/n)*thueMorseN)
+			}
+			if e == 3 {
+				sat = float64((100/n)*thueMorseN + t)
+			}
+		}
+		if i == 2 {
+			if e == 0 {
+				light = float64(0)
+			}
+			if e == 1 {
+				light = float64(50)
+			}
+			if e == 2 {
+				light = float64((100/n)*thueMorseN)
+			}
+			if e == 3 {
+				light = float64((100/n)*thueMorseN + t)
+			}
+		}
+		
 	}
-	return result
+	colour = coco.Hsl2Rgb(hue, sat, light)
+	r := int32(colour[0])
+	g := int32(colour[1])
+	b := int32(colour[2])
+	return tcell.NewRGBColor(r, g, b)
 }
