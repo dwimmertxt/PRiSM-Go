@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"prism-go/internal/helpers"
 	"prism-go/internal/parser"
+
 	"github.com/gdamore/tcell/v2"
-	
 )
+
 /*
 func Calculate(operators [3]string, t, n int) (map[int]map[int]int, int) {
 	d := (n * 2) - 1
@@ -40,7 +41,7 @@ func Render(s tcell.Screen, c *helpers.Container, pause, drawUI, colour bool, te
 		var c string
 		if colour == true {
 			c = "hue"
-		} 
+		}
 		if colour == false {
 			c = "lightness"
 		}
@@ -48,9 +49,9 @@ func Render(s tcell.Screen, c *helpers.Container, pause, drawUI, colour bool, te
 		for y := 0; y < d; y++ {
 			for x := 0; x < d; x++ {
 				if p[y][x] != 32 {
-					style := tcell.StyleDefault.Foreground(helpers.Colour(c, p[y][x], n)).Background(tcell.ColorReset)  
+					style := tcell.StyleDefault.Foreground(helpers.Colour(c, p[y][x], n)).Background(tcell.ColorReset)
 					s.SetContent(
-						helpers.Centre(termWH[0], d) + x, helpers.Centre(termWH[1], d) + y, 
+						helpers.Centre(termWH[0], d) + x, helpers.Centre(termWH[1], d) + y,
 						rune('█'), nil, style)
 				}
 			}
@@ -61,8 +62,6 @@ func Render(s tcell.Screen, c *helpers.Container, pause, drawUI, colour bool, te
 	}
 	s.Show()
 }*/
-
-
 
 func Render(s tcell.Screen, colour bool, ops [3]string, termWH [2]int, n, t int) {
 	// border
@@ -80,20 +79,20 @@ func Render(s tcell.Screen, colour bool, ops [3]string, termWH [2]int, n, t int)
 				if z != (n - 1) {
 					if x == 0 || y == 0 {
 						thueMorseN := ThueMorse(x, y, z, t, n, ops[0], ops[1], ops[2])
-						style := tcell.StyleDefault.Foreground(helpers.Colour(c, thueMorseN, n, t)).Background(tcell.ColorReset)  
+						style := tcell.StyleDefault.Foreground(helpers.Colour(c, thueMorseN, n, t)).Background(tcell.ColorReset)
 						s.SetContent(
-							helpers.Centre(termWH[0], d) + x + z, helpers.Centre(termWH[1], d) + y + z, 
+							helpers.Centre(termWH[0], d)+x+z, helpers.Centre(termWH[1], d)+y+z,
 							rune('█'), nil, style)
 					}
 				} else {
 					thueMorseN := ThueMorse(x, y, z, t, n, ops[0], ops[1], ops[2])
-					style := tcell.StyleDefault.Foreground(helpers.Colour(c, thueMorseN, n, t)).Background(tcell.ColorReset)  
+					style := tcell.StyleDefault.Foreground(helpers.Colour(c, thueMorseN, n, t)).Background(tcell.ColorReset)
 					s.SetContent(
-						helpers.Centre(termWH[0], d) + x + z, helpers.Centre(termWH[1], d) + y + z, 
+						helpers.Centre(termWH[0], d)+x+z, helpers.Centre(termWH[1], d)+y+z,
 						rune('█'), nil, style)
 				}
 			}
-		}		
+		}
 	}
 }
 
@@ -101,9 +100,9 @@ func ThueMorse(t, z, y, x, n int, o1, o2, o3 string) int {
 	//var toSum []int
 	var parsed int
 	/*
-	for _, i := range []int{t, z, y, x} {
-		toSum = append(toSum, numberToBase(i, b))
-	}*/
+		for _, i := range []int{t, z, y, x} {
+			toSum = append(toSum, numberToBase(i, b))
+		}*/
 	t = NumberToBase(t, n)
 	z = NumberToBase(z, n)
 	y = NumberToBase(y, n)
@@ -128,10 +127,10 @@ func NumberToBase(n, b int) int {
 	return Sum(digits)
 }
 
-func Sum(array []int) int {  
-	 result := 0  
-	 for _, v := range array {  
-	  result += v  
-	 }  
-	 return result  
-} 
+func Sum(array []int) int {
+	result := 0
+	for _, v := range array {
+		result += v
+	}
+	return result
+}
