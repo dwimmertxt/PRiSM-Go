@@ -4,6 +4,7 @@ import (
 	"log"
 	//"sync"
 	"time"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/hisamafahri/coco"
 )
@@ -20,7 +21,7 @@ func Modulo(a, b int) int {
 }
 
 func Centre(a int, b int) int {
-	centre := (a / 2) - (b / 2) 
+	centre := (a / 2) - (b / 2)
 	return centre
 }
 
@@ -28,9 +29,9 @@ func Colour(key string, index, n, t int) tcell.Color {
 	var colour [3]float64
 	switch key {
 	case "hue-fun":
-		hue := float64((360 / n) * index + t)
-		sat := float64((100 / n) * index + t)
-		light := float64((100 / n) * index + t)
+		hue := float64((360/n)*index + t)
+		sat := float64((100/n)*index + t)
+		light := float64((100/n)*index + t)
 		//colour = coco.Hsl2Rgb(hue, 100, 50)
 		colour = coco.Hsl2Rgb(hue, sat, light)
 	case "hue":
@@ -54,7 +55,7 @@ func Colour(key string, index, n, t int) tcell.Color {
 }
 
 func Sleep(timeNow time.Time, framerate int) {
-	nap := time.Duration(1000000000 / framerate) - time.Since(timeNow)
+	nap := time.Duration(1000000000/framerate) - time.Since(timeNow)
 	if nap > 0 {
 		time.Sleep(nap * time.Nanosecond)
 	}
@@ -65,4 +66,6 @@ func TimeTrack(start time.Time, name string) {
 	log.Printf("%s took %s", name, elapsed)
 }
 
+/*
 func ParseRune(rune tcell.KeyRune, )
+*/

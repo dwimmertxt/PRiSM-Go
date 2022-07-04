@@ -4,11 +4,11 @@ import (
 	//"fmt"
 	"log"
 	"os"
-	"time"
 	"prism-go/internal/helpers"
 	"prism-go/internal/prism"
+	"time"
+
 	"github.com/gdamore/tcell/v2"
-	
 )
 
 func main() {
@@ -22,34 +22,37 @@ func main() {
 	}
 	s.SetStyle(defStyle)
 	s.Clear()
-	
+
 	quit := func() {
 		s.Fini()
 		os.Exit(0)
 	}
 
-	c := new(helpers.Container)
+	ps := new(helpers.PrismState)
 	width, height := s.Size()
-	c.InitContainer(width, height)
-	
-	go func(s tcell.Screen, c *helpers.Container) {
+	ps.InitPrismState(width, height)
+
+	is := new(helpers.InterfaceState)
+	is.InitInterfaceState()
+
+	go func(s tcell.Screen, ps *helpers.PrismState, is *helpers.InterfaceState) {
 		t := 0
 		for {
-			pause, drawUI, colour, termWH, n, operators := c.ReadContainer() 
+			pause, drawUI, colour, termWH, n := ps.ReadPrismState()
 			timeNow := time.Now()
-			if pause == false {
-				prism.Render(s, colour, operators, termWH, n, t)
+			if !pause {
+				prism.Render(s, colour, is.GetOps(), termWH, n, t)
 				t++
 			} else {
-				prism.Render(s, colour, operators, termWH, n, t)
+				prism.Render(s, colour, is.GetOps(), termWH, n, t)
 			}
-			if drawUI == true {
-				c.DrawUI(s)
+			if drawUI {
+				ps.DrawUI(s, is)
 			}
 			s.Show()
 			helpers.Sleep(timeNow, 24)
-			}
-	}(s, c)	
+		}
+	}(s, ps, is)
 
 	for {
 		s.Show()
@@ -59,30 +62,30 @@ func main() {
 		case *tcell.EventResize:
 			s.Sync()
 			width, height := s.Size()
-			c.UpdateTermDimensions(width, height)
-		case *tcell.EventKey: 
+			ps.UpdateTermDimensions(width, height)
+		case *tcell.EventKey:
 			switch ev.Key() {
 			case tcell.KeyEscape:
 				quit()
 			case tcell.KeyCtrlC:
 				quit()
 			case tcell.KeyF1:
-				c.UpdateUI()
+				ps.UpdateUI()
 			case tcell.KeyF2:
-				c.UpdatePause()
+				ps.UpdatePause()
 			case tcell.KeyF3:
-				c.UpdateColour()
+				ps.UpdateColour()
 			case tcell.KeyLeft:
-				c.SelectOperator("left")	
+				is.SelectOperator("left")
 			case tcell.KeyRight:
-				c.SelectOperator("right")
+				is.SelectOperator("right")
 			case tcell.KeyUp:
-				c.CycleOperator("up")
+				is.CycleOperator("up")
 			case tcell.KeyDown:
-				c.CycleOperator("down")
-			case tcell.KeyEnter:					
+				is.CycleOperator("down")
+			case tcell.KeyEnter:
 			}
 
 		}
-	}		
+	}
 }
