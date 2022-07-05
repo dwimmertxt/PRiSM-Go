@@ -8,8 +8,8 @@ import (
 type PrismState struct {
 	mu     	sync.Mutex
 	pause 	bool
-	drawUI 	bool
 	termWH 	[2]int
+	fps		int
 	n      	int
 }
 
@@ -18,15 +18,15 @@ func (ps *PrismState) InitPrismState(width, height int) {
 	defer ps.mu.Unlock()
 	ps.termWH[0] = width
 	ps.termWH[1] = height
+	ps.fps = 24
 	ps.n = int(math.Round(float64(MinInt(width, height)-1) / float64(3)))
 	ps.pause = false
-	ps.drawUI = true
 }
 
-func (ps *PrismState) ReadPrismState() (bool, bool, [2]int, int) {
+func (ps *PrismState) ReadPrismState() (bool, [2]int, int, int) {
 	ps.mu.Lock()
 	defer ps.mu.Unlock()
-	return ps.pause, ps.drawUI, ps.termWH, ps.n
+	return ps.pause, ps.termWH, ps.fps, ps.n
 }
 
 func (ps *PrismState) SetTermWH(width, height int) {
@@ -52,13 +52,11 @@ func (ps *PrismState) SetPause() {
 	}
 }
 
-func (ps *PrismState) SetDrawUI() {
+func (ps *PrismState) GetTermWH() [2]int {
 	ps.mu.Lock()
-	defer ps.mu.Unlock()	
-	if ps.drawUI == false {
-		ps.drawUI = true
-	} else {
-		ps.drawUI = false
-	}
+	defer ps.mu.Unlock()
+	return ps.termWH
 }
+
+
 

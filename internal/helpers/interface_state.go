@@ -6,6 +6,8 @@ import (
 
 type InterfaceState struct {
 	mu      		sync.Mutex
+	showUI 			bool
+	showInfo		bool
 	opIndex 		int
 	opState 		[3]int
 	uiState 		int
@@ -14,6 +16,8 @@ type InterfaceState struct {
 }
 
 func (is *InterfaceState) InitInterfaceState() {
+	is.showUI = true
+	is.showInfo = true
 	is.opIndex = 0
 	is.colourIndex = 0
 	is.uiState = 0
@@ -86,10 +90,38 @@ func (is *InterfaceState) OperatorStringFromIndex(index int) string {
 	}
 }
 
+
+
+func (is *InterfaceState) SetShowUI() {
+	is.mu.Lock()
+	defer is.mu.Unlock()	
+	if is.showUI == false {
+		is.showUI = true
+	} else {
+		is.showUI = false
+	}
+}
+
+func (is *InterfaceState) SetShowInfo() {
+	is.mu.Lock()
+	defer is.mu.Unlock()	
+	if is.showInfo == false {
+		is.showInfo = true
+	} else {
+		is.showInfo = false
+	}
+}
+
 func (is *InterfaceState) GetUIState() int {
 	is.mu.Lock()
 	defer is.mu.Unlock()
 	return is.uiState
+}
+
+func (is *InterfaceState) GetShowUI() bool {
+	is.mu.Lock()
+	defer is.mu.Unlock()
+	return is.showUI
 }
 
 func (is *InterfaceState) GetOps() [3]string {
@@ -108,4 +140,9 @@ func (is *InterfaceState) GetColours() [3]int {
 	return is.colourState
 }
 
+func (is *InterfaceState) GetShowInfo() bool {
+	is.mu.Lock()
+	defer is.mu.Unlock()
+	return is.showInfo
+}
 

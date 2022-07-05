@@ -9,6 +9,14 @@ import (
 	"time"
 )
 
+/*
+Font utilised in this program:
+"Square" by Wouter van Oortmerssen is licensed under Creative Commons Attribution 3.0 Unported.
+https://strlen.com/
+https://strlen.com/square/
+https://creativecommons.org/licenses/by/3.0/deed.en_US
+*/
+
 func main() {
 	defStyle := tcell.StyleDefault.Background(tcell.ColorReset).Foreground(tcell.ColorReset)
 	s, err := tcell.NewScreen()
@@ -32,10 +40,11 @@ func main() {
 
 	is := new(helpers.InterfaceState)
 	is.InitInterfaceState()
+
 	go func(s tcell.Screen, ps *helpers.PrismState, is *helpers.InterfaceState) {
 		t := 0
 		for {
-			pause, drawUI, termWH, n := ps.ReadPrismState()
+			pause, termWH, fps, n := ps.ReadPrismState()
 			timeNow := time.Now()
 			if !pause {
 				prism.Render(s, is.GetOps(), is.GetColours(), termWH, n, t)
@@ -43,13 +52,17 @@ func main() {
 			} else {
 				prism.Render(s, is.GetOps(), is.GetColours(), termWH, n, t)
 			}
-			if drawUI {
-				is.DrawUI(s)
+			if is.GetShowUI() {
+				is.DrawUI(s, termWH, n, fps)
+			}
+			if is.GetShowInfo() {
+				is.DrawInfo(s, termWH)
 			}
 			s.Show()
-			helpers.Sleep(timeNow, 60)
+			helpers.Sleep(timeNow, fps)
 		}
 	}(s, ps, is)
+
 	for {
 		s.Show()
 		ev := s.PollEvent()
@@ -66,39 +79,41 @@ func main() {
 			case tcell.KeyCtrlC:
 				quit()
 			case tcell.KeyF1:
-				ps.SetDrawUI()
+				is.SetShowUI()
 			case tcell.KeyF2:
+				is.SetShowInfo()
+			case tcell.KeyF3:
 				ps.SetPause()
-				case tcell.KeyLeft:
-					switch is.GetUIState() {
-					case 0:
-						is.SelectState("left", "opIndex")
-					case 1:
-						is.SelectState("left", "colourIndex")
-					}
-				case tcell.KeyRight:
-					switch is.GetUIState() {
-					case 0:
-						is.SelectState("right", "opIndex")
-					case 1:
-						is.SelectState("right", "colourIndex")
-					}
-				case tcell.KeyUp:
-					switch is.GetUIState() {
-					case 0:
-						is.CycleState("up", "opState")
-					case 1:
-						is.CycleState("up", "colourState")
-					}
-				case tcell.KeyDown:
-					switch is.GetUIState() {
-					case 0:
-						is.CycleState("up", "opState")
-					case 1:
-						is.CycleState("down", "colourState")
-					}
-				case tcell.KeyTab:
-					is.CycleUIState()
+			case tcell.KeyLeft:
+				switch is.GetUIState() {
+				case 0:
+					is.SelectState("left", "opIndex")
+				case 1:
+					is.SelectState("left", "colourIndex")
+				}
+			case tcell.KeyRight:
+				switch is.GetUIState() {
+				case 0:
+					is.SelectState("right", "opIndex")
+				case 1:
+					is.SelectState("right", "colourIndex")
+				}
+			case tcell.KeyUp:
+				switch is.GetUIState() {
+				case 0:
+					is.CycleState("up", "opState")
+				case 1:
+					is.CycleState("up", "colourState")
+				}
+			case tcell.KeyDown:
+				switch is.GetUIState() {
+				case 0:
+					is.CycleState("up", "opState")
+				case 1:
+					is.CycleState("down", "colourState")
+				}
+			case tcell.KeyTab:
+				is.CycleUIState()
 			}
 		}
 	}

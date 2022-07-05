@@ -10,7 +10,6 @@ import (
 
 func Render(s tcell.Screen, ops [3]string, colours [3]int, termWH [2]int, n, t int) {
 	// border
-
 	s.Clear()
 	d := n * 2
 	for z := 0; z < n; z++ {
@@ -41,56 +40,43 @@ func thueMorse(n, t, z, y, x int, o1, o2, o3 string) int {
 func getColour(colours [3]int, thueMorseN, n, t int) tcell.Color {
 	var hue, sat, light float64
 	var colour [3]float64
-
 	for i, e := range colours {
-		if i == 0 {
-			if e == 0 {
+		switch i {
+		case 0:
+			switch e {
+			case 0:
 				hue = float64(0)
-			}
-			if e == 1 {
+			case 1:
 				hue = float64((360/n)*helpers.Modulo(t, n))
-			}
-			if e == 2 {
-				//hue = float64((360/n)*thueMorseN)
+			case 2:
 				hue = float64((360/n)*helpers.Modulo(thueMorseN+t, n))
-			}
-			if e == 3 {
+			case 3:
 				hue = float64((360/n)*thueMorseN + t)
 			}
-		}
-		if i == 1 {
-			if e == 0 {
+		case 1:
+			switch e {
+			case 0:
 				sat = float64(0)
-			}
-			if e == 1 {
+			case 1:
 				sat = float64(100)
-			}
-			if e == 2 {
+			case 2:
 				sat = float64((100/n)*thueMorseN)
-			}
-			if e == 3 {
+			case 3:
 				sat = float64((100/n)*thueMorseN + t)
 			}
-		}
-		if i == 2 {
-			if e == 0 {
+		case 2:
+			switch e {
+			case 0:
 				light = float64(0)
-			}
-			if e == 1 {
+			case 1:
 				light = float64(50)
-			}
-			if e == 2 {
+			case 2:
 				light = float64((100/n)*thueMorseN)
-			}
-			if e == 3 {
+			case 3:
 				light = float64((100/n)*thueMorseN + t)
 			}
 		}
-		
 	}
 	colour = coco.Hsl2Rgb(hue, sat, light)
-	r := int32(colour[0])
-	g := int32(colour[1])
-	b := int32(colour[2])
-	return tcell.NewRGBColor(r, g, b)
+	return tcell.NewRGBColor(int32(colour[0]), int32(colour[1]), int32(colour[2]))
 }
