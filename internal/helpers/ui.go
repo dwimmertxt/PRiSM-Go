@@ -86,8 +86,6 @@ func (is *InterfaceState) drawColours(s tcell.Screen, y *int, x int) {
 			strState = "100"
 		case 2:
 			strState = "TMn"
-		case 3:
-			strState = " +t"
 		}
 		switch i {
 		case 0:

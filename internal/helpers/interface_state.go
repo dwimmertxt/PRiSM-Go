@@ -21,12 +21,12 @@ func (is *InterfaceState) InitInterfaceState() {
 	is.opIndex = 0
 	is.colourIndex = 0
 	is.uiState = 0
-	is.colourState[0] = 0
-	is.colourState[1] = 0
-	is.colourState[2] = 3 
-	is.opState[0] = 0
+	is.colourState[0] = 2
+	is.colourState[1] = 2
+	is.colourState[2] = 2 
+	is.opState[0] = 2
 	is.opState[1] = 1
-	is.opState[2] = 1
+	is.opState[2] = 2
 }
 
 func (is *InterfaceState) SelectState(key, state string) {
@@ -59,14 +59,14 @@ func (is *InterfaceState) CycleState(key, state string) {
 			is.opState[is.opIndex] = Modulo((is.opState[is.opIndex] + 1), 3)
 		}
 		if state == "colourState" {
-			is.colourState[is.colourIndex] = Modulo((is.colourState[is.colourIndex] + 1), 4)
+			is.colourState[is.colourIndex] = Modulo((is.colourState[is.colourIndex] + 1), 3)
 		}		
 	case "down":
 		if state == "opState" {
 			is.opState[is.opIndex] = Modulo((is.opState[is.opIndex] - 1), 3)
 		}
 		if state == "colourState" {
-			is.colourState[is.colourIndex] = Modulo((is.colourState[is.colourIndex] - 1), 4)
+			is.colourState[is.colourIndex] = Modulo((is.colourState[is.colourIndex] - 1), 3)
 		}		
 	}
 }
@@ -89,8 +89,6 @@ func (is *InterfaceState) OperatorStringFromIndex(index int) string {
 		return ""
 	}
 }
-
-
 
 func (is *InterfaceState) SetShowUI() {
 	is.mu.Lock()
